@@ -666,14 +666,11 @@ nav{
   cursor: pointer;
   transition: 0.3s;
   text-align: center;
-  text-decoration: none;
   display: inline-block;
-}
-
-.download-btn.mp4 {
   background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
   color: white;
   box-shadow: 0 0 25px rgba(255,0,200,0.5);
+  border: none;
 }
 
 .download-btn.mp3 {
@@ -685,6 +682,12 @@ nav{
 .download-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 0 30px rgba(0,255,255,0.7);
+}
+
+.download-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .progress-wrapper {
@@ -1170,8 +1173,8 @@ nav{
     <div class="channel-info" id="channelInfo"></div>
     
     <div class="download-buttons">
-      <a class="download-btn mp4" id="downloadMp4Btn" target="_blank" rel="noopener noreferrer">⬇ Download MP4 (Video)</a>
-      <a class="download-btn mp3" id="downloadMp3Btn" target="_blank" rel="noopener noreferrer">⬇ Download MP3 (Audio)</a>
+      <button class="download-btn mp4" id="downloadMp4Btn">⬇ Download MP4 (Video)</button>
+      <button class="download-btn mp3" id="downloadMp3Btn">⬇ Download MP3 (Audio)</button>
     </div>
     
     <div class="progress-wrapper" id="progressWrapper">
@@ -1483,21 +1486,8 @@ function displayResults(data) {
     </div>
   `;
   
-  if (data.audio?.download_url) {
-    downloadMp3Btn.href = data.audio.download_url;
-    downloadMp3Btn.style.display = "inline-block";
-    downloadMp3Btn.setAttribute('download', '');
-  } else {
-    downloadMp3Btn.style.display = "none";
-  }
-  
-  if (data.video?.download_url) {
-    downloadMp4Btn.href = data.video.download_url;
-    downloadMp4Btn.style.display = "inline-block";
-    downloadMp4Btn.setAttribute('download', '');
-  } else {
-    downloadMp4Btn.style.display = "none";
-  }
+  // Store URLs for download
+  currentVideoData = data;
 }
 
 copyTitleBtn.addEventListener('click', () => {
@@ -1527,6 +1517,97 @@ copyTitleBtn.addEventListener('click', () => {
 
 closeResults.addEventListener('click', () => {
   resultsSection.classList.remove('active');
+});
+
+/* =====================================================
+   DOWNLOAD FUNCTIONALITY - STAYS ON SITE!
+===================================================== */
+
+async function downloadFile(url, filename, type) {
+  if (!url) {
+    showToast("No download URL available");
+    return;
+  }
+
+  progressWrapper.style.display = "block";
+  progressBar.style.width = "0%";
+  
+  // Disable download buttons during download
+  downloadMp4Btn.disabled = true;
+  downloadMp3Btn.disabled = true;
+
+  try {
+    // Fetch the file with progress tracking
+    const response = await fetch(url);
+    const reader = response.body.getReader();
+    const contentLength = +response.headers.get('Content-Length') || 1000000;
+
+    let receivedLength = 0;
+    let chunks = [];
+
+    while(true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      
+      chunks.push(value);
+      receivedLength += value.length;
+
+      // Update progress bar
+      const percent = (receivedLength / contentLength) * 100;
+      progressBar.style.width = Math.min(percent, 100) + "%";
+    }
+
+    // Create blob and download
+    const blob = new Blob(chunks);
+    const blobUrl = window.URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    window.URL.revokeObjectURL(blobUrl);
+    
+    showToast(`✅ ${type} downloaded successfully!`);
+    
+  } catch (error) {
+    console.error("Download error:", error);
+    showToast("❌ Download failed - please try again");
+  } finally {
+    // Re-enable download buttons
+    downloadMp4Btn.disabled = false;
+    downloadMp3Btn.disabled = false;
+    
+    // Hide progress bar after a delay
+    setTimeout(() => {
+      progressWrapper.style.display = "none";
+      progressBar.style.width = "0%";
+    }, 1000);
+  }
+}
+
+// MP4 Download
+downloadMp4Btn.addEventListener('click', () => {
+  if (!currentVideoData?.video?.download_url) {
+    showToast("No video URL available");
+    return;
+  }
+  
+  const filename = (currentVideoData.title || "video") + ".mp4";
+  downloadFile(currentVideoData.video.download_url, filename, "MP4");
+});
+
+// MP3 Download
+downloadMp3Btn.addEventListener('click', () => {
+  if (!currentVideoData?.audio?.download_url) {
+    showToast("No audio URL available");
+    return;
+  }
+  
+  const filename = (currentVideoData.title || "audio") + ".mp3";
+  downloadFile(currentVideoData.audio.download_url, filename, "MP3");
 });
 
 /* =====================================================
