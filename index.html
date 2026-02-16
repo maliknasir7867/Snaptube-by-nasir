@@ -1719,31 +1719,15 @@ closeResults.addEventListener('click', () => {
 });
 
 /* =====================================================
-   FIXED DOWNLOAD WITH PROGRESS BAR - MP4 FIXED!
+   FIXED DOWNLOAD WITH PROGRESS BAR - NOW MOVES SMOOTHLY!
 ===================================================== */
 
-// Working CORS proxies that don't require API keys - optimized for video
+// Working CORS proxies that don't require API keys
 const corsProxies = [
-  'https://api.allorigins.win/raw?url=',
-  'https://corsproxy.io/?',
-  'https://proxy.cors.sh/',
-  'https://cors-anywhere.herokuapp.com/'
+  'https://api.codetabs.com/v1/proxy?quest=',
+  'https://cors-anywhere.herokuapp.com/',
+  'https://api.allorigins.win/raw?url='
 ];
-
-// Timeout for large files (30 seconds)
-const DOWNLOAD_TIMEOUT = 30000;
-
-async function downloadWithTimeout(promise, timeoutMs) {
-  let timeoutHandle;
-  const timeoutPromise = new Promise((_, reject) => {
-    timeoutHandle = setTimeout(() => reject(new Error('Download timeout - file may be too large')), timeoutMs);
-  });
-
-  return Promise.race([
-    promise,
-    timeoutPromise
-  ]).finally(() => clearTimeout(timeoutHandle));
-}
 
 async function downloadFile(url, filename, type) {
   if (!url) {
@@ -1759,43 +1743,28 @@ async function downloadFile(url, filename, type) {
   downloadMp4Btn.disabled = true;
   downloadMp3Btn.disabled = true;
 
-  showToast(`⏳ Preparing ${type} download... (this may take a moment for videos)`);
-
-  let lastError = null;
+  showToast(`⏳ Preparing ${type} download...`);
 
   // Try each proxy until one works
   for (let i = 0; i < corsProxies.length; i++) {
     try {
       const proxyUrl = corsProxies[i] + encodeURIComponent(url);
       
-      showToast(`🔄 Trying download method ${i + 1}/${corsProxies.length}...`);
-      
-      // Start the fetch with progress tracking and timeout
-      const response = await downloadWithTimeout(fetch(proxyUrl, {
-        headers: {
-          'Accept': 'video/mp4,audio/mpeg,*/*',
-          'Origin': window.location.origin
-        }
-      }), DOWNLOAD_TIMEOUT);
+      // Start the fetch with progress tracking
+      const response = await fetch(proxyUrl);
       
       if (!response.ok) {
-        throw new Error(`Proxy ${i + 1} failed (${response.status})`);
+        throw new Error(`Proxy ${i} failed`);
       }
       
       // Get content length if available
       const contentLength = response.headers.get('content-length');
       const total = contentLength ? parseInt(contentLength, 10) : 0;
       
-      // For large files, show a message
-      if (total > 50 * 1024 * 1024) { // 50MB
-        showToast(`📦 Large file detected (${(total/1024/1024).toFixed(1)}MB). Please wait...`);
-      }
-      
       // Create a reader to stream the data
       const reader = response.body.getReader();
       let receivedLength = 0;
       let chunks = [];
-      let lastUpdate = Date.now();
       
       // Read the stream chunk by chunk
       while(true) {
@@ -1808,23 +1777,19 @@ async function downloadFile(url, filename, type) {
         chunks.push(value);
         receivedLength += value.length;
         
-        // Update progress bar every 100ms to avoid too many updates
-        const now = Date.now();
-        if (now - lastUpdate > 100) {
-          if (total > 0) {
-            const percent = (receivedLength / total) * 100;
-            progressBar.style.width = percent + "%";
-          } else {
-            // If no content-length, show progress based on received data
-            const fakePercent = Math.min((receivedLength / 5000000) * 100, 95); // Assume ~5MB average
-            progressBar.style.width = fakePercent + "%";
-          }
-          lastUpdate = now;
+        // Update progress bar if we know the total size
+        if (total > 0) {
+          const percent = (receivedLength / total) * 100;
+          progressBar.style.width = percent + "%";
+        } else {
+          // If no content-length, show indeterminate progress (move to 50%)
+          const fakePercent = Math.min(50 + (receivedLength / 1000000) * 10, 90);
+          progressBar.style.width = fakePercent + "%";
         }
       }
       
       // Combine chunks into a single blob
-      const blob = new Blob(chunks, { type: type === 'MP4' ? 'video/mp4' : 'audio/mpeg' });
+      const blob = new Blob(chunks);
       
       // Create download link
       const blobUrl = window.URL.createObjectURL(blob);
@@ -1843,44 +1808,22 @@ async function downloadFile(url, filename, type) {
       // Clean up
       window.URL.revokeObjectURL(blobUrl);
       
-      showToast(`✅ ${type} downloaded successfully! (${(receivedLength/1024/1024).toFixed(1)}MB)`);
+      showToast(`✅ ${type} downloaded successfully!`);
       
       // Success - break out of loop
-      return;
+      break;
       
     } catch (error) {
-      console.log(`Proxy ${i + 1} failed:`, error);
-      lastError = error;
+      console.log(`Proxy ${i} failed, trying next...`);
       
-      // Show progress for next attempt
-      if (i < corsProxies.length - 1) {
-        showToast(`⚠️ Method ${i + 1} failed, trying next...`);
+      // If this was the last proxy, show error
+      if (i === corsProxies.length - 1) {
+        showToast("❌ Download failed - please try again");
       }
       
-      // Continue to next proxy
+      // Otherwise continue to next proxy
       continue;
     }
-  }
-
-  // If all proxies failed, try direct download as last resort
-  try {
-    showToast("🔄 Trying direct download method...");
-    
-    // Create a temporary anchor for direct download
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    
-    progressBar.style.width = "100%";
-    showToast(`✅ ${type} download started in new tab!`);
-    
-  } catch (directError) {
-    showToast("❌ All download methods failed. Please try again later.");
   }
 
   // Re-enable download buttons
@@ -1891,7 +1834,7 @@ async function downloadFile(url, filename, type) {
   setTimeout(() => {
     progressWrapper.style.display = "none";
     progressBar.style.width = "0%";
-  }, 3000);
+  }, 2000);
 }
 
 // MP4 Download
