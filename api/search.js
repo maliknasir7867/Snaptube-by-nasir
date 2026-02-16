@@ -1,33 +1,25 @@
 const axios = require('axios');
 
 module.exports = async (req, res) => {
-    // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    // Important: Set content type to JSON
     res.setHeader('Content-Type', 'application/json');
-
-    // Handle preflight OPTIONS request
+    
+    // Handle preflight
     if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+        res.status(200).end();
+        return;
     }
 
     // Only allow GET
     if (req.method !== 'GET') {
-        return res.status(405).json({ 
-            status: false, 
-            error: 'Method not allowed' 
-        });
+        return res.status(405).json({ status: false, error: 'Method not allowed' });
     }
 
     try {
         const { query } = req.query;
         
         if (!query) {
-            return res.status(400).json({ 
-                status: false, 
-                error: 'Query is required' 
-            });
+            return res.status(400).json({ status: false, error: 'Query is required' });
         }
 
         console.log('Searching for:', query);
@@ -35,23 +27,20 @@ module.exports = async (req, res) => {
         const apiUrl = `https://apis.davidcyril.name.ng/song?query=${encodeURIComponent(query)}`;
         
         const response = await axios.get(apiUrl, {
-            timeout: 15000,
+            timeout: 10000,
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Accept': 'application/json'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
         });
 
-        // Make sure we're returning JSON
+        // Return the data exactly as received
         return res.status(200).json(response.data);
         
     } catch (error) {
         console.error('Search error:', error.message);
-        
-        // Return JSON error, not HTML
         return res.status(500).json({ 
             status: false, 
-            error: 'Search failed: ' + error.message 
+            error: 'Search failed. Please try again.' 
         });
     }
 };
