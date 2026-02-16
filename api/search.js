@@ -5,6 +5,7 @@ module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Content-Type', 'application/json');
 
     // Handle preflight OPTIONS request
     if (req.method === 'OPTIONS') {
@@ -31,7 +32,6 @@ module.exports = async (req, res) => {
 
         console.log('Searching for:', query);
 
-        // Your existing API endpoint
         const apiUrl = `https://apis.davidcyril.name.ng/song?query=${encodeURIComponent(query)}`;
         
         const response = await axios.get(apiUrl, {
@@ -42,13 +42,13 @@ module.exports = async (req, res) => {
             }
         });
 
-        // Return the exact same format your frontend expects
+        // Make sure we're returning JSON
         return res.status(200).json(response.data);
         
     } catch (error) {
         console.error('Search error:', error.message);
         
-        // Return in the same format your frontend expects
+        // Return JSON error, not HTML
         return res.status(500).json({ 
             status: false, 
             error: 'Search failed: ' + error.message 
