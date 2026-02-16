@@ -1,12 +1,7 @@
 {
   "name": "snaptube-vercel",
   "version": "1.0.0",
-  "description": "SnapTube Vercel Backend",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "vercel-build": "echo Hello"
-  },
+  "description": "SnapTube with secure proxy backend",
   "dependencies": {
     "axios": "^1.6.0"
   }
