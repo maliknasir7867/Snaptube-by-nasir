@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en"> 
 <head> 
@@ -357,7 +358,7 @@ nav{
 }
 
 /* =====================================================
-   OWNER INFO MODAL
+   OWNER INFO MODAL (UPDATED WITH WHATSAPP NUMBER)
 ===================================================== */
 
 .modal-overlay {
@@ -443,7 +444,7 @@ nav{
 }
 
 .info-label {
-  width: 100px;
+  width: 120px;
   font-weight: 600;
   color: var(--neon-blue);
 }
@@ -451,6 +452,27 @@ nav{
 .info-value {
   flex: 1;
   color: var(--text-main);
+}
+
+.info-value a {
+  color: #25D366;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.info-value a:hover {
+  color: var(--neon-pink);
+  transform: scale(1.05);
+}
+
+.info-value a svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
 .profession-list {
@@ -471,6 +493,15 @@ nav{
   position: absolute;
   left: 0;
   font-size: 20px;
+}
+
+/* WhatsApp Number Highlight */
+.whatsapp-number {
+  background: rgba(37, 211, 102, 0.1);
+  border-radius: 30px;
+  padding: 5px 12px;
+  display: inline-block;
+  border: 1px solid rgba(37, 211, 102, 0.3);
 }
 
 /* =====================================================
@@ -1247,7 +1278,7 @@ nav{
     </a>
   </div>
 
-  <!-- Owner Info Modal -->
+  <!-- Owner Info Modal (UPDATED WITH WHATSAPP NUMBER) -->
   <div class="modal-overlay" id="ownerModal">
     <div class="modal-card">
       <div class="modal-close" id="closeModal">✕</div>
@@ -1255,12 +1286,12 @@ nav{
       
       <div class="owner-info">
         <div class="info-row">
-          <div class="info-label">Name:</div>
+          <div class="info-label">👤 Name:</div>
           <div class="info-value">Nasir Hacker</div>
         </div>
         
         <div class="info-row">
-          <div class="info-label">Profession:</div>
+          <div class="info-label">💼 Profession:</div>
           <div class="info-value">
             <ul class="profession-list">
               <li>Web Developer</li>
@@ -1272,17 +1303,29 @@ nav{
         </div>
         
         <div class="info-row">
-          <div class="info-label">Age:</div>
+          <div class="info-label">📱 WhatsApp:</div>
+          <div class="info-value">
+            <a href="https://wa.me/923057175014?text=👋%20Hi%20Nasir!%20I%20saw%20your%20SnapTube%20website%20and%20I'm%20interested%20in%20your%20services.%20Can%20you%20help%20me%3F" target="_blank" class="whatsapp-number">
+              <svg viewBox="0 0 24 24" width="16" height="16">
+                <path d="M19.077 4.928C17.191 3.041 14.683 2 12.006 2 6.798 2 2.548 6.193 2.54 11.393c-.003 1.747.456 3.457 1.328 4.985L2.25 21.75l5.433-1.566c1.494.832 3.175 1.274 4.902 1.276h.004c5.192 0 9.444-4.194 9.452-9.394.004-2.512-1.01-4.872-2.914-6.758zM12.025 20.031h-.003c-1.488 0-2.944-.403-4.211-1.159l-.302-.18-3.227.93.992-3.146-.174-.31a8.416 8.416 0 0 1-1.288-4.468c.008-4.656 3.794-8.438 8.46-8.438 2.256 0 4.377.88 5.973 2.478 1.592 1.594 2.467 3.713 2.463 5.966-.008 4.656-3.795 8.437-8.463 8.437zM16.293 14.1c-.242-.121-1.432-.706-1.654-.787-.222-.08-.383-.121-.544.121-.161.242-.625.787-.766.948-.141.161-.282.181-.524.06-.868-.404-1.584-1.113-2.165-1.92-.163-.242-.017-.373.115-.578.094-.145.213-.316.284-.476.081-.16.041-.302-.02-.424-.061-.121-.544-1.311-.746-1.796-.196-.472-.396-.404-.544-.414-.142-.01-.302-.01-.462-.01s-.423.06-.644.302c-.221.242-.847.827-.847 2.018 0 1.19.867 2.341.989 2.502.121.161 1.673 2.663 4.134 3.631.576.222 1.032.358 1.386.46.586.168 1.12.144 1.543.088.473-.064 1.456-.595 1.662-1.17.206-.575.206-1.069.144-1.17-.061-.101-.222-.161-.464-.283z"/>
+              </svg>
+              +92 305 7175014
+            </a>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <div class="info-label">🎂 Age:</div>
           <div class="info-value">20 Years</div>
         </div>
         
         <div class="info-row">
-          <div class="info-label">City:</div>
+          <div class="info-label">📍 City:</div>
           <div class="info-value">Bhakkar, Punjab, Pakistan</div>
         </div>
         
         <div class="info-row">
-          <div class="info-label">Education:</div>
+          <div class="info-label">📚 Education:</div>
           <div class="info-value">Student of BSCS</div>
         </div>
       </div>
@@ -1677,7 +1720,7 @@ closeResults.addEventListener('click', () => {
 });
 
 /* =====================================================
-   FIXED DOWNLOAD FUNCTIONALITY - USING CORS.LOL (FREE, NO API KEY)
+   FIXED DOWNLOAD WITH PROGRESS BAR - NOW MOVES SMOOTHLY!
 ===================================================== */
 
 // Working CORS proxies that don't require API keys
@@ -1687,14 +1730,13 @@ const corsProxies = [
   'https://api.allorigins.win/raw?url='
 ];
 
-let currentProxyIndex = 0;
-
 async function downloadFile(url, filename, type) {
   if (!url) {
     showToast("No download URL available");
     return;
   }
 
+  // Show progress bar and reset to 0
   progressWrapper.style.display = "block";
   progressBar.style.width = "0%";
   
@@ -1709,17 +1751,52 @@ async function downloadFile(url, filename, type) {
     try {
       const proxyUrl = corsProxies[i] + encodeURIComponent(url);
       
+      // Start the fetch with progress tracking
       const response = await fetch(proxyUrl);
       
       if (!response.ok) {
         throw new Error(`Proxy ${i} failed`);
       }
       
-      // Get the data as blob
-      const blob = await response.blob();
+      // Get content length if available
+      const contentLength = response.headers.get('content-length');
+      const total = contentLength ? parseInt(contentLength, 10) : 0;
+      
+      // Create a reader to stream the data
+      const reader = response.body.getReader();
+      let receivedLength = 0;
+      let chunks = [];
+      
+      // Read the stream chunk by chunk
+      while(true) {
+        const {done, value} = await reader.read();
+        
+        if (done) {
+          break;
+        }
+        
+        chunks.push(value);
+        receivedLength += value.length;
+        
+        // Update progress bar if we know the total size
+        if (total > 0) {
+          const percent = (receivedLength / total) * 100;
+          progressBar.style.width = percent + "%";
+        } else {
+          // If no content-length, show indeterminate progress (move to 50%)
+          const fakePercent = Math.min(50 + (receivedLength / 1000000) * 10, 90);
+          progressBar.style.width = fakePercent + "%";
+        }
+      }
+      
+      // Combine chunks into a single blob
+      const blob = new Blob(chunks);
       
       // Create download link
       const blobUrl = window.URL.createObjectURL(blob);
+      
+      // Complete the progress bar
+      progressBar.style.width = "100%";
       
       // Trigger download
       const a = document.createElement('a');
@@ -1732,7 +1809,6 @@ async function downloadFile(url, filename, type) {
       // Clean up
       window.URL.revokeObjectURL(blobUrl);
       
-      progressBar.style.width = "100%";
       showToast(`✅ ${type} downloaded successfully!`);
       
       // Success - break out of loop
@@ -1743,7 +1819,7 @@ async function downloadFile(url, filename, type) {
       
       // If this was the last proxy, show error
       if (i === corsProxies.length - 1) {
-        throw new Error("All proxies failed");
+        showToast("❌ Download failed - please try again");
       }
       
       // Otherwise continue to next proxy
