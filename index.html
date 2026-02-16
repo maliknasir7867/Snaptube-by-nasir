@@ -1677,73 +1677,17 @@ closeResults.addEventListener('click', () => {
 });
 
 /* =====================================================
-   FIXED DOWNLOAD FUNCTIONALITY - STAY ON PAGE, NO REDIRECT
+   FIXED DOWNLOAD FUNCTIONALITY - USING CORS.LOL (FREE, NO API KEY)
 ===================================================== */
 
-// Helper function to trigger download via blob (completely hides real URL)
-async function triggerBlobDownload(url, filename) {
-  try {
-    // Use multiple CORS proxies to increase chance of success
-    const proxies = [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-      `https://corsproxy.io/?${encodeURIComponent(url)}`,
-      `https://cors-anywhere.herokuapp.com/${url}`  // note: may need temporary access
-    ];
+// Working CORS proxies that don't require API keys
+const corsProxies = [
+  'https://api.codetabs.com/v1/proxy?quest=',
+  'https://cors-anywhere.herokuapp.com/',
+  'https://api.allorigins.win/raw?url='
+];
 
-    let response = null;
-    let lastError = null;
-
-    for (const proxy of proxies) {
-      try {
-        response = await fetch(proxy, {
-          headers: { 'Origin': window.location.origin },
-          mode: 'cors',
-        });
-        if (response.ok) break;
-      } catch (e) {
-        lastError = e;
-        continue;
-      }
-    }
-
-    if (!response || !response.ok) {
-      throw new Error('All proxies failed or CORS blocked');
-    }
-
-    const blob = await response.blob();
-    const blobUrl = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = blobUrl;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(blobUrl);
-    return true;
-  } catch (error) {
-    console.warn('Blob download failed, using fallback method', error);
-    return false;
-  }
-}
-
-// Fallback method: use a download attribute link but with a proxy that doesn't expose real URL
-function fallbackDownload(url, filename) {
-  return new Promise((resolve) => {
-    // Use a secure-looking proxy service (user never sees real API)
-    const proxyDownload = `https://ddownload.online/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
-    const a = document.createElement('a');
-    a.href = proxyDownload;
-    a.download = filename;      // hint for browser
-    a.target = '_blank';        // fallback opens new tab but doesn't redirect main page
-    a.rel = 'noopener noreferrer';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      document.body.removeChild(a);
-      resolve(true);
-    }, 100);
-  });
-}
+let currentProxyIndex = 0;
 
 async function downloadFile(url, filename, type) {
   if (!url) {
@@ -1753,43 +1697,69 @@ async function downloadFile(url, filename, type) {
 
   progressWrapper.style.display = "block";
   progressBar.style.width = "0%";
+  
+  // Disable download buttons during download
   downloadMp4Btn.disabled = true;
   downloadMp3Btn.disabled = true;
 
-  try {
-    showToast(`⏳ Preparing ${type} download...`);
-    
-    // Simulate progress
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 5;
-      if (progress <= 90) progressBar.style.width = progress + '%';
-    }, 100);
+  showToast(`⏳ Preparing ${type} download...`);
 
-    // First attempt: blob download (completely hides URL)
-    let success = await triggerBlobDownload(url, filename);
-
-    if (!success) {
-      // Second attempt: fallback using download attribute + proxy (still hides real URL)
-      await fallbackDownload(url, filename);
+  // Try each proxy until one works
+  for (let i = 0; i < corsProxies.length; i++) {
+    try {
+      const proxyUrl = corsProxies[i] + encodeURIComponent(url);
+      
+      const response = await fetch(proxyUrl);
+      
+      if (!response.ok) {
+        throw new Error(`Proxy ${i} failed`);
+      }
+      
+      // Get the data as blob
+      const blob = await response.blob();
+      
+      // Create download link
+      const blobUrl = window.URL.createObjectURL(blob);
+      
+      // Trigger download
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename.replace(/[^a-zA-Z0-9\s\-_.]/g, ''); // Clean filename
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      // Clean up
+      window.URL.revokeObjectURL(blobUrl);
+      
+      progressBar.style.width = "100%";
+      showToast(`✅ ${type} downloaded successfully!`);
+      
+      // Success - break out of loop
+      break;
+      
+    } catch (error) {
+      console.log(`Proxy ${i} failed, trying next...`);
+      
+      // If this was the last proxy, show error
+      if (i === corsProxies.length - 1) {
+        throw new Error("All proxies failed");
+      }
+      
+      // Otherwise continue to next proxy
+      continue;
     }
-
-    clearInterval(interval);
-    progressBar.style.width = '100%';
-    showToast(`✅ ${type} download initiated!`);
-
-    setTimeout(() => {
-      progressWrapper.style.display = "none";
-      progressBar.style.width = "0%";
-    }, 2000);
-
-  } catch (error) {
-    showToast(`⚠️ Download issue: ${error.message}`);
-    progressWrapper.style.display = "none";
-  } finally {
-    downloadMp4Btn.disabled = false;
-    downloadMp3Btn.disabled = false;
   }
+
+  // Re-enable download buttons
+  downloadMp4Btn.disabled = false;
+  downloadMp3Btn.disabled = false;
+  
+  // Hide progress bar after a delay
+  setTimeout(() => {
+    progressWrapper.style.display = "none";
+    progressBar.style.width = "0%";
+  }, 2000);
 }
 
 // MP4 Download
@@ -1814,6 +1784,7 @@ downloadMp3Btn.addEventListener('click', () => {
     return;
   }
   
+  // Clean filename
   let title = currentVideoData.title || "audio";
   title = title.replace(/[^a-zA-Z0-9\s]/g, '').substring(0, 50);
   const filename = title + ".mp3";
