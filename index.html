@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>SnapTube — Ultra YouTube Downloader</title> 
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
+  <style>
+
+/* =====================================================
+   2026 GLOBAL DESIGN SYSTEM (SNAPTOK STYLE)
+===================================================== */
+
+:root{
+  --bg-1:#0f0c29;
+  --bg-2:#1a1f3a;
+  --bg-3:#24243e;
+
+  --neon-blue:#00f5ff;
+  --neon-pink:#ff00c8;
+  --neon-purple:#7b2ff7;
+
+  --glass-bg:rgba(255,255,255,0.05);
+  --glass-border:rgba(255,255,255,0.12);
+
+  --text-main:#ffffff;
+  --text-dim:rgba(255,255,255,0.7);
+
+  --radius-xl:30px;
+  --radius-lg:20px;
+  --radius-md:14px;
+
+  --shadow-deep:0 40px 120px rgba(0,0,0,0.6);
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html,body{
+  font-family:'Inter',sans-serif;
+  color:var(--text-main);
+  background:linear-gradient(-45deg,var(--bg-1),var(--bg-2),var(--bg-3));
+  background-size:400% 400%;
+  animation:gradientShift 20s ease infinite;
+  scroll-behavior:smooth;
+  overflow-x:hidden;
+}
+
+@keyframes gradientShift{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+
+/* =====================================================
+   PARTICLE CANVAS BACKGROUND
+===================================================== */
+
+#bgCanvas{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:-1;
+}
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+nav{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  padding:20px 60px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  backdrop-filter:blur(25px);
+  background:rgba(0,0,0,0.3);
+  border-bottom:1px solid var(--glass-border);
+  z-index:1000;
+}
+
+.nav-logo{
+  font-weight:800;
+  font-size:20px;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.nav-links{
+  display:flex;
+  gap:30px;
+  align-items: center;
+}
+
+.nav-links a{
+  text-decoration:none;
+  color:var(--text-dim);
+  font-size:14px;
+  transition:0.3s;
+}
+
+.nav-links a:hover{
+  color:var(--neon-blue);
+}
+
+/* =====================================================
+   HAMBURGER MENU
+===================================================== */
+
+.hamburger-menu {
+  position: relative;
+  z-index: 1001;
+}
+
+.hamburger-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.hamburger-icon:hover {
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 20px var(--neon-blue);
+  transform: scale(1.05);
+}
+
+.hamburger-icon span {
+  width: 20px;
+  height: 2px;
+  background: var(--text-main);
+  border-radius: 4px;
+  transition: 0.3s ease;
+}
+
+/* Hamburger Animation */
+.hamburger-icon.active span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburger-icon.active span:nth-child(2) {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.hamburger-icon.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 220px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: 0.3s ease;
+  box-shadow: var(--shadow-deep);
+}
+
+.dropdown-menu.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.menu-item {
+  padding: 12px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  color: var(--text-dim);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-item:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text-main);
+  transform: translateX(5px);
+}
+
+.menu-item svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/* Theme Toggle Inside Menu */
+.theme-options {
+  padding: 5px 0;
+}
+
+.theme-option {
+  padding: 8px 15px 8px 35px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  color: var(--text-dim);
+  font-size: 13px;
+  margin: 2px 0;
+}
+
+.theme-option:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--neon-blue);
+  transform: translateX(5px);
+}
+
+.theme-option.active {
+  color: var(--neon-blue);
+  background: rgba(0,255,255,0.1);
+}
+
+/* =====================================================
+   OWNER INFO MODAL
+===================================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-card {
+  width: 90%;
+  max-width: 500px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  position: relative;
+  transform: scale(0.9);
+  transition: 0.3s ease;
+  box-shadow: var(--shadow-deep);
+}
+
+.modal-overlay.active .modal-card {
+  transform: scale(1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--glass-border);
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.3s ease;
+  font-size: 18px;
+}
+
+.modal-close:hover {
+  background: var(--neon-pink);
+  color: white;
+  transform: rotate(90deg);
+}
+
+.modal-title {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 25px;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.owner-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-row {
+  display: flex;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 10px;
+}
+
+.info-label {
+  width: 100px;
+  font-weight: 600;
+  color: var(--neon-blue);
+}
+
+.info-value {
+  flex: 1;
+  color: var(--text-main);
+}
+
+.profession-list {
+  list-style: none;
+  margin-top: 5px;
+}
+
+.profession-list li {
+  margin-bottom: 5px;
+  color: var(--text-dim);
+  position: relative;
+  padding-left: 20px;
+}
+
+.profession-list li::before {
+  content: "•";
+  color: var(--neon-pink);
+  position: absolute;
+  left: 0;
+  font-size: 20px;
+}
+
+/* =====================================================
+   REST OF YOUR EXISTING STYLES (KEPT UNCHANGED)
+===================================================== */
+
+.hero{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding-top:100px;
+  text-align:center;
+}
+
+.hero-title{
+  font-size:60px;
+  font-weight:900;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:20px;
+  letter-spacing:-2px;
+}
+
+.hero-sub{
+  font-size:18px;
+  color:var(--text-dim);
+  margin-bottom:50px;
+  max-width:700px;
+}
+
+.downloader-wrapper{
+  width:100%;
+  max-width:700px;
+  background:var(--glass-bg);
+  backdrop-filter:blur(40px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius-xl);
+  padding:60px;
+  box-shadow:var(--shadow-deep);
+  transition:0.4s;
+  margin-bottom: 30px;
+}
+
+.downloader-wrapper:hover{
+  box-shadow:0 0 100px rgba(0,255,255,0.2);
+}
+
+.input-group{
+  position:relative;
+}
+
+.input-group input{
+  width:100%;
+  padding:20px 28px;
+  border-radius:60px;
+  border:1px solid var(--glass-border);
+  background:rgba(255,255,255,0.05);
+  color:#fff;
+  font-size:15px;
+  outline:none;
+  transition:0.4s ease;
+}
+
+.input-group input:focus{
+  border-color:var(--neon-blue);
+  box-shadow:0 0 30px rgba(0,255,255,0.6);
+}
+
+.primary-btn{
+  width:100%;
+  margin-top:30px;
+  padding:18px;
+  border:none;
+  border-radius:60px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-pink));
+  color:#fff;
+  transition:0.35s ease;
+  box-shadow:0 0 35px rgba(255,0,200,0.5);
+}
+
+.primary-btn:hover{
+  transform:translateY(-3px) scale(1.03);
+  box-shadow:0 0 60px rgba(0,255,255,0.9);
+}
+
+.results-section {
+  width: 100%;
+  max-width: 900px;
+  margin: 30px auto 60px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(40px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  box-shadow: var(--shadow-deep);
+  transition: 0.4s;
+  display: none;
+}
+
+.results-section.active {
+  display: block;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 15px;
+}
+
+.results-title {
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.close-results {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  border-radius: 50px;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+  color: var(--text-dim);
+}
+
+.close-results:hover {
+  background: rgba(255, 0, 200, 0.2);
+  color: white;
+}
+
+.thumbnail-container {
+  width: 100%;
+  margin-bottom: 30px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: rgba(0,0,0,0.3);
+}
+
+.thumbnail-container img {
+  width: 100%;
+  display: block;
+}
+
+.stats-grid-results {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.stat-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 20px 10px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.stat-item:hover {
+  background: rgba(0, 255, 255, 0.1);
+  transform: translateY(-3px);
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: var(--neon-blue);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.title-container {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 15px 20px;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.title-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.title-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--neon-blue);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.copy-title-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--glass-border);
+  border-radius: 30px;
+  padding: 6px 15px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: 0.3s;
+}
+
+.copy-title-btn:hover {
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 0 15px rgba(255,0,200,0.5);
+}
+
+.copy-title-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.title-box {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  max-height: 80px;
+  overflow-y: auto;
+  color: var(--text-main);
+  padding-right: 10px;
+}
+
+.channel-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+  padding: 15px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+}
+
+.channel-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.channel-details {
+  flex: 1;
+}
+
+.channel-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.channel-subscribers {
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+.download-buttons {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.download-btn {
+  flex: 1;
+  padding: 15px;
+  border: none;
+  border-radius: 60px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.download-btn.mp4 {
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+  color: white;
+  box-shadow: 0 0 25px rgba(255,0,200,0.5);
+}
+
+.download-btn.mp3 {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--glass-border);
+  color: white;
+}
+
+.download-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 30px rgba(0,255,255,0.7);
+}
+
+.progress-wrapper {
+  margin-top: 20px;
+  display: none;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 10px;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+  border-radius: 10px;
+  transition: width 0.2s;
+}
+
+.progress-bg {
+  width: 100%;
+  height: 10px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+}
+
+.loader {
+  margin: 30px auto;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  border: 5px solid rgba(255,255,255,0.15);
+  border-top: 5px solid var(--neon-blue);
+  animation: spin 1s linear infinite;
+  display: none;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.toast {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  background: rgba(0,0,0,0.9);
+  border: 1px solid var(--neon-pink);
+  padding: 16px 22px;
+  border-radius: 14px;
+  box-shadow: 0 0 25px rgba(255,0,200,0.6);
+  display: none;
+  z-index: 3000;
+  animation: slideIn 0.5s ease forwards;
+  font-size: 14px;
+  max-width: 320px;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.section{
+  padding:120px 60px;
+  position:relative;
+}
+
+.section-title{
+  text-align:center;
+  font-size:40px;
+  font-weight:800;
+  margin-bottom:20px;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.section-sub{
+  text-align:center;
+  color:var(--text-dim);
+  margin-bottom:70px;
+}
+
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:30px;
+}
+
+.stat-card{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-radius:20px;
+  padding:40px 20px;
+  text-align:center;
+  backdrop-filter:blur(30px);
+  transition:0.3s ease;
+}
+
+.stat-card:hover{
+  transform:translateY(-8px);
+  box-shadow:0 0 40px rgba(0,255,255,0.3);
+}
+
+.stat-number{
+  font-size:38px;
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+.stat-label{
+  font-size:14px;
+  color:var(--text-dim);
+}
+
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:30px;
+}
+
+.feature-card{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-radius:20px;
+  padding:40px;
+  transition:0.4s ease;
+  backdrop-filter:blur(30px);
+}
+
+.feature-card:hover{
+  transform:translateY(-10px);
+  box-shadow:0 0 50px rgba(255,0,200,0.3);
+}
+
+.feature-title{
+  font-size:20px;
+  font-weight:700;
+  margin-bottom:15px;
+}
+
+.feature-desc{
+  font-size:14px;
+  color:var(--text-dim);
+}
+
+.how-section{
+  padding:100px 60px;
+  background:rgba(0,0,0,0.05);
+  backdrop-filter:blur(30px);
+  margin-top:80px;
+  border-radius:var(--radius-xl);
+}
+
+.how-title{
+  text-align:center;
+  font-size:36px;
+  font-weight:800;
+  margin-bottom:30px;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.how-steps{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:30px;
+}
+
+.step-card{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius-lg);
+  padding:30px;
+  text-align:center;
+  transition:0.3s;
+}
+
+.step-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 0 40px rgba(255,0,200,0.3);
+}
+
+.step-number{
+  font-size:28px;
+  font-weight:800;
+  margin-bottom:10px;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.step-desc{
+  font-size:14px;
+  color:var(--text-dim);
+}
+
+.faq-section{
+  padding:80px 60px;
+}
+
+.faq-title{
+  text-align:center;
+  font-size:36px;
+  font-weight:800;
+  margin-bottom:30px;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.faq-item{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius-md);
+  margin-bottom:15px;
+  overflow:hidden;
+}
+
+.faq-question{
+  padding:20px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.faq-answer{
+  max-height:0;
+  padding:0 20px;
+  overflow:hidden;
+  color:var(--text-dim);
+  font-size:14px;
+  transition:0.4s ease;
+}
+
+.faq-item.active .faq-answer{
+  max-height:200px;
+  padding:15px 20px;
+}
+
+.footer{
+  position:fixed;
+  bottom:25px;
+  left:0;
+  width:100%;
+  text-align:center;
+  font-size:13px;
+  letter-spacing:1px;
+  color:var(--text-dim);
+  text-shadow:0 0 15px var(--neon-blue);
+  transition:0.3s;
+  z-index: 100;
+}
+
+.footer:hover{
+  color:#fff;
+  text-shadow:0 0 25px var(--neon-pink);
+}
+
+.dashboard-section{
+  padding:120px 60px;
+  background:rgba(0,0,0,0.08);
+  backdrop-filter:blur(25px);
+  border-radius:var(--radius-xl);
+  margin-top:80px;
+}
+
+.dashboard-title{
+  text-align:center;
+  font-size:36px;
+  font-weight:800;
+  margin-bottom:50px;
+  background:linear-gradient(90deg,var(--neon-blue),var(--neon-pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.analytics-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:30px;
+}
+
+.analytics-card{
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-radius:20px;
+  padding:40px;
+  text-align:center;
+  transition:0.4s ease;
+}
+
+.analytics-card:hover{
+  transform:translateY(-8px);
+  box-shadow:0 0 50px rgba(0,255,255,0.5);
+}
+
+.analytics-number{
+  font-size:32px;
+  font-weight:800;
+  margin-bottom:12px;
+}
+
+.analytics-label{
+  font-size:14px;
+  color:var(--text-dim);
+}
+
+@media(max-width:1000px){
+  .stats-grid, .features-grid, .how-steps, .analytics-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:768px){
+  nav{
+    padding:20px 30px;
+  }
+  .hero-title{
+    font-size:40px;
+  }
+  .downloader-wrapper{
+    padding:40px 25px;
+  }
+  .stats-grid-results {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .download-buttons {
+    flex-direction: column;
+  }
+  .title-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .modal-card {
+    padding: 30px 20px;
+  }
+  .info-row {
+    flex-direction: column;
+  }
+  .info-label {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+}
+
+@media(max-width:600px){
+  .stats-grid, .features-grid, .how-steps, .analytics-grid{
+    grid-template-columns:1fr;
+  }
+  .section{
+    padding:60px 20px;
+  }
+}
+
+</style> 
+</head> 
+<body> 
+  <canvas id="bgCanvas"></canvas> 
+  <nav> 
+    <div class="nav-logo">SnapTube</div> 
+    <div class="nav-links"> 
+      <a href="#home">Home</a> 
+      <a href="#features">Features</a> 
+      <a href="#faq">FAQ</a> 
+      
+      <!-- Hamburger Menu -->
+      <div class="hamburger-menu">
+        <div class="hamburger-icon" id="hamburgerIcon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        
+        <!-- Dropdown Menu -->
+        <div class="dropdown-menu" id="dropdownMenu">
+          <!-- Theme Options (Moved inside menu) -->
+          <div class="menu-item" style="cursor: default; pointer-events: none;">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" fill="none" stroke-width="2"/>
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            </svg>
+            <span>Theme Options</span>
+          </div>
+          <div class="theme-options">
+            <div class="theme-option" onclick="setTheme('cyber')">✨ Cyberpunk</div>
+            <div class="theme-option" onclick="setTheme('aurora')">🌌 Aurora</div>
+            <div class="theme-option" onclick="setTheme('matrix')">💚 Matrix</div>
+          </div>
+          
+          <div style="height: 1px; background: var(--glass-border); margin: 8px 0;"></div>
+          
+          <!-- Owner Info Menu Item -->
+          <div class="menu-item" id="ownerInfoMenuItem">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" fill="none" stroke-width="2"/>
+              <circle cx="12" cy="7" r="4" stroke="currentColor" fill="none" stroke-width="2"/>
+            </svg>
+            <span>Owner Info</span>
+          </div>
+        </div>
+      </div>
+    </div> 
+  </nav> 
+
+  <!-- Owner Info Modal -->
+  <div class="modal-overlay" id="ownerModal">
+    <div class="modal-card">
+      <div class="modal-close" id="closeModal">✕</div>
+      <h2 class="modal-title">Owner Information</h2>
+      
+      <div class="owner-info">
+        <div class="info-row">
+          <div class="info-label">Name:</div>
+          <div class="info-value">Nasir Hacker</div>
+        </div>
+        
+        <div class="info-row">
+          <div class="info-label">Profession:</div>
+          <div class="info-value">
+            <ul class="profession-list">
+              <li>Web Developer</li>
+              <li>Telegram Bots Developer</li>
+              <li>WhatsApp MD + Bug Bot Developer</li>
+              <li>Expert in Coding</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <div class="info-label">Age:</div>
+          <div class="info-value">20 Years</div>
+        </div>
+        
+        <div class="info-row">
+          <div class="info-label">City:</div>
+          <div class="info-value">Bhakkar, Punjab, Pakistan</div>
+        </div>
+        
+        <div class="info-row">
+          <div class="info-label">Education:</div>
+          <div class="info-value">Student of BSCS</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="hero" id="home"> 
+    <h1 class="hero-title">Download YouTube Songs & Videos</h1> 
+    <p class="hero-sub"> Search by song name, artist, or movie title. Get MP3 & MP4 instantly. No URL needed! </p> 
+    <div class="downloader-wrapper"> 
+      <div class="input-group"> 
+        <input type="text" id="searchInput" placeholder="Search: song name, artist, movie... (e.g., 'Shape of You' or 'Avengers')"> 
+      </div> 
+      <button class="primary-btn" id="searchBtn">Search & Download</button> 
+      <div class="loader" id="loader"></div>
+    </div> 
+  </section>
+
+  <!-- RESULTS SECTION -->
+  <div class="results-section" id="resultsSection">
+    <div class="results-header">
+      <div class="results-title">🎬 Search Results</div>
+      <button class="close-results" id="closeResults">✕ Close</button>
+    </div>
+    
+    <div class="thumbnail-container" id="thumbnailContainer" style="display: none;">
+      <img id="thumbnail" src="" alt="Video thumbnail">
+    </div>
+    
+    <div class="stats-grid-results" id="statsGrid"></div>
+    
+    <div class="title-container">
+      <div class="title-header">
+        <div class="title-label">🎵 Video Title</div>
+        <button class="copy-title-btn" id="copyTitleBtn">
+          <svg viewBox="0 0 24 24" width="14" height="14">
+            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+          </svg>
+          Copy Title
+        </button>
+      </div>
+      <div class="title-box" id="titleBox"></div>
+    </div>
+    
+    <div class="channel-info" id="channelInfo"></div>
+    
+    <div class="download-buttons">
+      <a class="download-btn mp4" id="downloadMp4Btn" target="_blank" rel="noopener noreferrer">⬇ Download MP4 (Video)</a>
+      <a class="download-btn mp3" id="downloadMp3Btn" target="_blank" rel="noopener noreferrer">⬇ Download MP3 (Audio)</a>
+    </div>
+    
+    <div class="progress-wrapper" id="progressWrapper">
+      <div class="progress-bg">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+
+  <!-- STATS SECTION -->
+  <section class="section" id="stats"> 
+    <h2 class="section-title">Platform Statistics</h2> 
+    <p class="section-sub">Trusted globally by music lovers</p> 
+    <div class="stats-grid"> 
+     <div class="stat-card"> <div class="stat-number" data-target="25000">0</div> <div class="stat-label">Downloads</div> </div> 
+     <div class="stat-card"> <div class="stat-number" data-target="15000">0</div> <div class="stat-label">Active Users</div> </div> 
+     <div class="stat-card"> <div class="stat-number" data-target="99">0</div> <div class="stat-label">Uptime %</div> </div> 
+     <div class="stat-card"> <div class="stat-number" data-target="120">0</div> <div class="stat-label">Countries</div> </div> 
+    </div> 
+  </section>
+  
+  <!-- FEATURES SECTION -->
+  <section class="section" id="features"> 
+    <h2 class="section-title">Premium Features</h2> 
+    <p class="section-sub">Built like a $10,000 SaaS product</p> 
+    <div class="features-grid"> 
+     <div class="feature-card"> <div class="feature-title">Search by Name</div> <div class="feature-desc">Just type song name, artist, or movie - no URL needed!</div> </div> 
+     <div class="feature-card"> <div class="feature-title">MP3 & MP4</div> <div class="feature-desc">Download both video and audio formats with one click.</div> </div> 
+     <div class="feature-card"> <div class="feature-title">Fast Processing</div> <div class="feature-desc">Lightning-speed downloads with intelligent caching.</div> </div> 
+     <div class="feature-card"> <div class="feature-title">High Quality</div> <div class="feature-desc">Get the best available quality for your downloads.</div> </div> 
+     <div class="feature-card"> <div class="feature-title">Theme Engine</div> <div class="feature-desc">Switch between Cyberpunk, Aurora, and Matrix styles.</div> </div> 
+     <div class="feature-card"> <div class="feature-title">Glass UI System</div> <div class="feature-desc">Layered glassmorphism with neon glow interactions.</div> </div> 
+    </div> 
+  </section>
+  
+  <!-- HOW IT WORKS SECTION -->
+  <section class="how-section" id="how"> 
+    <h2 class="how-title">How It Works</h2> 
+    <div class="how-steps"> 
+     <div class="step-card"> <div class="step-number">1</div> <div class="step-desc">Type song name, artist, or movie title.</div> </div> 
+     <div class="step-card"> <div class="step-number">2</div> <div class="step-desc">Click Search & Download to fetch results.</div> </div> 
+     <div class="step-card"> <div class="step-number">3</div> <div class="step-desc">Choose MP4 or MP3 and download instantly.</div> </div> 
+    </div> 
+  </section>
+  
+  <!-- FAQ SECTION -->
+  <section class="faq-section" id="faq"> 
+    <h2 class="faq-title">Frequently Asked Questions</h2> 
+    <div class="faq-item"> <div class="faq-question">Is this downloader free?</div> <div class="faq-answer">Yes! You can download any song or video instantly with no charges.</div> </div> 
+    <div class="faq-item"> <div class="faq-question">Do I need a YouTube URL?</div> <div class="faq-answer">No! Just type the song name, artist name, or movie title.</div> </div> 
+    <div class="faq-item"> <div class="faq-question">Can I download MP3 only?</div> <div class="faq-answer">Yes, we provide both MP4 video and MP3 audio downloads.</div> </div> 
+  </section>
+  
+  <div class="footer">Owner: NASIR HACKER</div>
+  
+  <!-- DASHBOARD SECTION -->
+  <section class="dashboard-section" id="dashboard"> 
+    <h2 class="dashboard-title">Download Analytics (Mock)</h2> 
+    <div class="analytics-grid"> 
+     <div class="analytics-card"> <div class="analytics-number" data-target="4560">0</div> <div class="analytics-label">Songs Downloaded Today</div> </div> 
+     <div class="analytics-card"> <div class="analytics-number" data-target="320">0</div> <div class="analytics-label">Active Sessions</div> </div> 
+     <div class="analytics-card"> <div class="analytics-number" data-target="1890">0</div> <div class="analytics-label">Videos Previewed</div> </div> 
+    </div> 
+  </section>
+  
+  <script>
+
+/* =====================================================
+   PARTICLE BACKGROUND ENGINE
+===================================================== */
+
+const canvas = document.getElementById("bgCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+
+class Particle{
+  constructor(){
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.radius = Math.random() * 2 + 1;
+    this.speedX = (Math.random() - 0.5) * 0.5;
+    this.speedY = (Math.random() - 0.5) * 0.5;
+  }
+  update(){
+    this.x += this.speedX;
+    this.y += this.speedY;
+
+    if(this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+    if(this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);
+    ctx.fillStyle = "rgba(0,255,255,0.6)";
+    ctx.fill();
+  }
+}
+
+function initParticles(){
+  particles = [];
+  for(let i=0;i<120;i++){
+    particles.push(new Particle());
+  }
+}
+
+function animateParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.update();
+    p.draw();
+  });
+  requestAnimationFrame(animateParticles);
+}
+
+initParticles();
+animateParticles();
+
+window.addEventListener("resize",()=>{
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  initParticles();
+});
+
+/* =====================================================
+   HAMBURGER MENU FUNCTIONALITY
+===================================================== */
+
+const hamburgerIcon = document.getElementById('hamburgerIcon');
+const dropdownMenu = document.getElementById('dropdownMenu');
+
+hamburgerIcon.addEventListener('click', (e) => {
+  e.stopPropagation();
+  hamburgerIcon.classList.toggle('active');
+  dropdownMenu.classList.toggle('active');
+});
+
+// Close menu when clicking outside
+document.addEventListener('click', (e) => {
+  if (!hamburgerIcon.contains(e.target) && !dropdownMenu.contains(e.target)) {
+    hamburgerIcon.classList.remove('active');
+    dropdownMenu.classList.remove('active');
+  }
+});
+
+/* =====================================================
+   OWNER INFO MODAL
+===================================================== */
+
+const ownerModal = document.getElementById('ownerModal');
+const ownerInfoMenuItem = document.getElementById('ownerInfoMenuItem');
+const closeModal = document.getElementById('closeModal');
+
+function openModal() {
+  ownerModal.classList.add('active');
+  // Close hamburger menu when opening modal
+  hamburgerIcon.classList.remove('active');
+  dropdownMenu.classList.remove('active');
+}
+
+function closeModalFunc() {
+  ownerModal.classList.remove('active');
+}
+
+ownerInfoMenuItem.addEventListener('click', openModal);
+closeModal.addEventListener('click', closeModalFunc);
+
+// Close modal when clicking overlay (outside card)
+ownerModal.addEventListener('click', (e) => {
+  if (e.target === ownerModal) {
+    closeModalFunc();
+  }
+});
+
+// Close with Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && ownerModal.classList.contains('active')) {
+    closeModalFunc();
+  }
+});
+
+/* =====================================================
+   ELEMENTS (YOUR EXISTING CODE)
+===================================================== */
+
+const searchInput = document.getElementById("searchInput");
+const searchBtn = document.getElementById("searchBtn");
+const loader = document.getElementById("loader");
+const toast = document.getElementById("toast");
+const resultsSection = document.getElementById("resultsSection");
+const closeResults = document.getElementById("closeResults");
+const thumbnailContainer = document.getElementById("thumbnailContainer");
+const thumbnail = document.getElementById("thumbnail");
+const statsGrid = document.getElementById("statsGrid");
+const titleBox = document.getElementById("titleBox");
+const copyTitleBtn = document.getElementById("copyTitleBtn");
+const channelInfo = document.getElementById("channelInfo");
+const downloadMp4Btn = document.getElementById("downloadMp4Btn");
+const downloadMp3Btn = document.getElementById("downloadMp3Btn");
+const progressWrapper = document.getElementById("progressWrapper");
+const progressBar = document.getElementById("progressBar");
+
+let currentVideoData = null;
+
+function showToast(message){
+  toast.innerText = message;
+  toast.style.display = "block";
+  setTimeout(()=>{ toast.style.display="none"; },3500);
+}
+
+function formatNumber(num) {
+  if (!num) return "0";
+  if (num >= 1000000) return (num/1000000).toFixed(1) + "M";
+  if (num >= 1000) return (num/1000).toFixed(1) + "K";
+  return num.toString();
+}
+
+searchBtn.addEventListener("click", async ()=>{
+
+  const query = searchInput.value.trim();
+
+  if(!query){
+    showToast("Please enter a song name, artist, or movie title.");
+    return;
+  }
+
+  loader.style.display = "block";
+  searchBtn.disabled = true;
+  
+  resultsSection.classList.remove("active");
+  thumbnailContainer.style.display = "none";
+
+  try {
+    const apiUrl = "https://apis.davidcyril.name.ng/song?query=" + encodeURIComponent(query);
+    
+    const response = await fetch(apiUrl);
+    const text = await response.text();
+    
+    let data;
+    try{
+      data = JSON.parse(text);
+    }catch(e){
+      throw new Error("Invalid API response");
+    }
+
+    loader.style.display = "none";
+    searchBtn.disabled = false;
+
+    if(!data.status){
+      showToast("No results found for: " + query);
+      return;
+    }
+
+    currentVideoData = data.result;
+    displayResults(currentVideoData);
+    
+    setTimeout(() => {
+      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+
+  } catch (error) {
+    loader.style.display = "none";
+    searchBtn.disabled = false;
+    showToast("Error: " + error.message);
+  }
+});
+
+searchInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    searchBtn.click();
+  }
+});
+
+function displayResults(data) {
+  
+  resultsSection.classList.add("active");
+  
+  thumbnailContainer.style.display = "block";
+  thumbnail.src = data.thumbnail || "https://via.placeholder.com/640x360?text=No+Thumbnail";
+  
+  const stats = [
+    { label: "👀 Views", value: formatNumber(data.views) },
+    { label: "⏱️ Duration", value: data.duration || "N/A" },
+    { label: "📅 Published", value: data.published || "Unknown" },
+    { label: "🎵 Format", value: "MP3/MP4" }
+  ];
+  
+  statsGrid.innerHTML = stats.map(stat => `
+    <div class="stat-item">
+      <div class="stat-value">${stat.value}</div>
+      <div class="stat-label">${stat.label}</div>
+    </div>
+  `).join('');
+  
+  titleBox.textContent = data.title || "No title available";
+  
+  const channelLetter = (data.channel || "YT").charAt(0).toUpperCase();
+  
+  channelInfo.innerHTML = `
+    <div class="channel-avatar">${channelLetter}</div>
+    <div class="channel-details">
+      <div class="channel-name">${data.channel || "YouTube Channel"}</div>
+      <div class="channel-subscribers">Verified Creator</div>
+    </div>
+  `;
+  
+  if (data.audio?.download_url) {
+    downloadMp3Btn.href = data.audio.download_url;
+    downloadMp3Btn.style.display = "inline-block";
+    downloadMp3Btn.setAttribute('download', '');
+  } else {
+    downloadMp3Btn.style.display = "none";
+  }
+  
+  if (data.video?.download_url) {
+    downloadMp4Btn.href = data.video.download_url;
+    downloadMp4Btn.style.display = "inline-block";
+    downloadMp4Btn.setAttribute('download', '');
+  } else {
+    downloadMp4Btn.style.display = "none";
+  }
+}
+
+copyTitleBtn.addEventListener('click', () => {
+  const title = titleBox.textContent;
+  
+  navigator.clipboard.writeText(title).then(() => {
+    showToast("✅ Title copied to clipboard!");
+    
+    copyTitleBtn.style.background = "linear-gradient(90deg, var(--neon-blue), var(--neon-pink))";
+    copyTitleBtn.style.color = "white";
+    
+    setTimeout(() => {
+      copyTitleBtn.style.background = "";
+      copyTitleBtn.style.color = "";
+    }, 500);
+    
+  }).catch(() => {
+    const textarea = document.createElement('textarea');
+    textarea.value = title;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    showToast("✅ Title copied!");
+  });
+});
+
+closeResults.addEventListener('click', () => {
+  resultsSection.classList.remove('active');
+});
+
+/* =====================================================
+   THEME ENGINE (MOVED INSIDE HAMBURGER MENU)
+===================================================== */
+
+function setTheme(type){
+  if(type==="cyber"){
+    document.documentElement.style.setProperty("--neon-blue","#00f5ff");
+    document.documentElement.style.setProperty("--neon-pink","#ff00c8");
+  }
+  if(type==="aurora"){
+    document.documentElement.style.setProperty("--neon-blue","#00ffcc");
+    document.documentElement.style.setProperty("--neon-pink","#3366ff");
+  }
+  if(type==="matrix"){
+    document.documentElement.style.setProperty("--neon-blue","#00ff00");
+    document.documentElement.style.setProperty("--neon-pink","#009933");
+  }
+  showToast("Theme switched to " + type);
+  
+  // Close menu after theme selection
+  hamburgerIcon.classList.remove('active');
+  dropdownMenu.classList.remove('active');
+}
+
+/* =====================================================
+   COUNTER ANIMATIONS (YOUR EXISTING CODE)
+===================================================== */
+
+const counters = document.querySelectorAll(".stat-number");
+function animateCounters(){
+  counters.forEach(counter=>{
+    const update = ()=>{
+      const target = +counter.getAttribute("data-target");
+      const count = +counter.innerText;
+      const increment = target / 200;
+      if(count < target){
+        counter.innerText = Math.ceil(count + increment);
+        setTimeout(update,10);
+      }else{
+        counter.innerText = target;
+      }
+    };
+    update();
+  });
+}
+
+let statsSection = document.getElementById("stats");
+window.addEventListener("scroll",()=>{
+  const rect = statsSection.getBoundingClientRect();
+  if(rect.top < window.innerHeight && !statsSection.classList.contains("animated")){
+    statsSection.classList.add("animated");
+    animateCounters();
+  }
+});
+
+const analyticsCounters = document.querySelectorAll(".analytics-number");
+function animateAnalytics(){
+  analyticsCounters.forEach(counter=>{
+    const update = ()=>{
+      const target = +counter.getAttribute("data-target");
+      const count = +counter.innerText;
+      const increment = target / 200;
+      if(count < target){
+        counter.innerText = Math.ceil(count + increment);
+        setTimeout(update,10);
+      }else{
+        counter.innerText = target;
+      }
+    };
+    update();
+  });
+}
+
+let dashboardSection = document.getElementById("dashboard");
+window.addEventListener("scroll",()=>{
+  const rect = dashboardSection.getBoundingClientRect();
+  if(rect.top < window.innerHeight && !dashboardSection.classList.contains("animated")){
+    dashboardSection.classList.add("animated");
+    animateAnalytics();
+  }
+});
+
+const faqItems = document.querySelectorAll(".faq-item");
+faqItems.forEach(item=>{
+  item.querySelector(".faq-question").addEventListener("click",()=>{
+    item.classList.toggle("active");
+  });
+});
+
+document.addEventListener("keydown",(e)=>{
+  if(e.key==="Enter" && !resultsSection.classList.contains('active')){
+    searchBtn.click();
+  }
+  if(e.key==="Escape" && resultsSection.classList.contains('active')){
+    resultsSection.classList.remove('active');
+  }
+});
+
+let touchStartY = 0;
+let touchEndY = 0;
+
+document.addEventListener("touchstart",(e)=>{
+  touchStartY = e.changedTouches[0].screenY;
+});
+
+document.addEventListener("touchend",(e)=>{
+  touchEndY = e.changedTouches[0].screenY;
+  if(touchEndY < touchStartY - 100){
+    window.scrollBy({top:400,behavior:'smooth'});
+  }
+  if(touchEndY > touchStartY + 100){
+    window.scrollBy({top:-400,behavior:'smooth'});
+  }
+});
+
+const buttons = document.querySelectorAll(".primary-btn, .theme-option, .download-btn, .copy-title-btn, .close-results, .menu-item");
+buttons.forEach(btn=>{
+  btn.addEventListener("mouseenter",()=>btn.style.transform="scale(1.03)");
+  btn.addEventListener("mouseleave",()=>btn.style.transform="scale(1)");
+});
+
+const allCards = document.querySelectorAll(".feature-card,.stat-card,.step-card,.analytics-card,.faq-item");
+allCards.forEach(card=>{
+  card.addEventListener("mouseenter",()=>{
+    card.style.boxShadow="0 0 60px rgba(255,0,200,0.5)";
+    card.style.transform="translateY(-6px)";
+  });
+  card.addEventListener("mouseleave",()=>{
+    card.style.boxShadow="0 0 30px rgba(0,0,0,0.2)";
+    card.style.transform="translateY(0)";
+  });
+});
+
+const navLinks = document.querySelectorAll(".nav-links a");
+navLinks.forEach(link=>{
+  link.addEventListener("click",e=>{
+    e.preventDefault();
+    const href = link.getAttribute("href");
+    if (href && href.startsWith("#")) {
+      document.querySelector(href).scrollIntoView({behavior:"smooth"});
+    }
+  });
+});
+
+canvas.addEventListener("mousemove",(e)=>{
+  particles.forEach(p=>{
+    const dx = p.x - e.clientX;
+    const dy = p.y - e.clientY;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if(dist < 120){
+      p.x += dx * 0.02;
+      p.y += dy * 0.02;
+    }
+  });
+});
+
+function animateParticlesOptimized(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.update();
+    p.draw();
+  });
+  requestAnimationFrame(animateParticlesOptimized);
+}
+
+animateParticlesOptimized();
+
+</script> 
+</body>
+</html>
