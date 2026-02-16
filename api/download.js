@@ -25,7 +25,7 @@ module.exports = async (req, res) => {
         }
 
         const decodedUrl = decodeURIComponent(url);
-        console.log('Downloading:', type, decodedUrl.substring(0, 100));
+        console.log('Downloading:', type);
         
         // Security: Allow only YouTube-related domains
         const allowedDomains = [
@@ -37,8 +37,7 @@ module.exports = async (req, res) => {
             'rr2---sn-n4v7knlr.googlevideo.com',
             'rr3---sn-n4v7knlr.googlevideo.com',
             'rr4---sn-n4v7knlr.googlevideo.com',
-            'rr5---sn-n4v7knlr.googlevideo.com',
-            'rr6---sn-n4v7knlr.googlevideo.com'
+            'rr5---sn-n4v7knlr.googlevideo.com'
         ];
         
         try {
@@ -55,13 +54,13 @@ module.exports = async (req, res) => {
             return res.status(400).json({ error: 'Invalid URL' });
         }
 
-        // Fetch the file with proper headers
+        // Fetch the file
         const response = await axios({
             method: 'GET',
             url: decodedUrl,
             responseType: 'stream',
             timeout: 30000,
-            maxContentLength: 50 * 1024 * 1024, // 50MB max for Vercel
+            maxContentLength: 50 * 1024 * 1024,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                 'Accept': '*/*',
@@ -70,10 +69,9 @@ module.exports = async (req, res) => {
         });
 
         // Generate filename
-        const timestamp = Date.now();
         const filename = type === 'mp3' 
-            ? `audio_${timestamp}.mp3` 
-            : `video_${timestamp}.mp4`;
+            ? `audio_${Date.now()}.mp3` 
+            : `video_${Date.now()}.mp4`;
 
         // Set headers for download
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
