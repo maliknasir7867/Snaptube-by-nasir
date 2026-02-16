@@ -357,7 +357,7 @@ nav{
 }
 
 /* =====================================================
-   OWNER INFO MODAL
+   OWNER INFO MODAL (UPDATED WITH WHATSAPP NUMBER)
 ===================================================== */
 
 .modal-overlay {
@@ -443,7 +443,7 @@ nav{
 }
 
 .info-label {
-  width: 100px;
+  width: 120px;
   font-weight: 600;
   color: var(--neon-blue);
 }
@@ -451,6 +451,27 @@ nav{
 .info-value {
   flex: 1;
   color: var(--text-main);
+}
+
+.info-value a {
+  color: #25D366;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.info-value a:hover {
+  color: var(--neon-pink);
+  transform: scale(1.05);
+}
+
+.info-value a svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
 .profession-list {
@@ -471,6 +492,15 @@ nav{
   position: absolute;
   left: 0;
   font-size: 20px;
+}
+
+/* WhatsApp Number Highlight */
+.whatsapp-number {
+  background: rgba(37, 211, 102, 0.1);
+  border-radius: 30px;
+  padding: 5px 12px;
+  display: inline-block;
+  border: 1px solid rgba(37, 211, 102, 0.3);
 }
 
 /* =====================================================
@@ -1247,7 +1277,7 @@ nav{
     </a>
   </div>
 
-  <!-- Owner Info Modal -->
+  <!-- Owner Info Modal (UPDATED WITH WHATSAPP NUMBER) -->
   <div class="modal-overlay" id="ownerModal">
     <div class="modal-card">
       <div class="modal-close" id="closeModal">✕</div>
@@ -1255,12 +1285,12 @@ nav{
       
       <div class="owner-info">
         <div class="info-row">
-          <div class="info-label">Name:</div>
+          <div class="info-label">👤 Name:</div>
           <div class="info-value">Nasir Hacker</div>
         </div>
         
         <div class="info-row">
-          <div class="info-label">Profession:</div>
+          <div class="info-label">💼 Profession:</div>
           <div class="info-value">
             <ul class="profession-list">
               <li>Web Developer</li>
@@ -1272,17 +1302,29 @@ nav{
         </div>
         
         <div class="info-row">
-          <div class="info-label">Age:</div>
+          <div class="info-label">📱 WhatsApp:</div>
+          <div class="info-value">
+            <a href="https://wa.me/923057175014?text=👋%20Hi%20Nasir!%20I%20saw%20your%20SnapTube%20website%20and%20I'm%20interested%20in%20your%20services.%20Can%20you%20help%20me%3F" target="_blank" class="whatsapp-number">
+              <svg viewBox="0 0 24 24" width="16" height="16">
+                <path d="M19.077 4.928C17.191 3.041 14.683 2 12.006 2 6.798 2 2.548 6.193 2.54 11.393c-.003 1.747.456 3.457 1.328 4.985L2.25 21.75l5.433-1.566c1.494.832 3.175 1.274 4.902 1.276h.004c5.192 0 9.444-4.194 9.452-9.394.004-2.512-1.01-4.872-2.914-6.758zM12.025 20.031h-.003c-1.488 0-2.944-.403-4.211-1.159l-.302-.18-3.227.93.992-3.146-.174-.31a8.416 8.416 0 0 1-1.288-4.468c.008-4.656 3.794-8.438 8.46-8.438 2.256 0 4.377.88 5.973 2.478 1.592 1.594 2.467 3.713 2.463 5.966-.008 4.656-3.795 8.437-8.463 8.437zM16.293 14.1c-.242-.121-1.432-.706-1.654-.787-.222-.08-.383-.121-.544.121-.161.242-.625.787-.766.948-.141.161-.282.181-.524.06-.868-.404-1.584-1.113-2.165-1.92-.163-.242-.017-.373.115-.578.094-.145.213-.316.284-.476.081-.16.041-.302-.02-.424-.061-.121-.544-1.311-.746-1.796-.196-.472-.396-.404-.544-.414-.142-.01-.302-.01-.462-.01s-.423.06-.644.302c-.221.242-.847.827-.847 2.018 0 1.19.867 2.341.989 2.502.121.161 1.673 2.663 4.134 3.631.576.222 1.032.358 1.386.46.586.168 1.12.144 1.543.088.473-.064 1.456-.595 1.662-1.17.206-.575.206-1.069.144-1.17-.061-.101-.222-.161-.464-.283z"/>
+              </svg>
+              +92 305 7175014
+            </a>
+          </div>
+        </div>
+        
+        <div class="info-row">
+          <div class="info-label">🎂 Age:</div>
           <div class="info-value">20 Years</div>
         </div>
         
         <div class="info-row">
-          <div class="info-label">City:</div>
+          <div class="info-label">📍 City:</div>
           <div class="info-value">Bhakkar, Punjab, Pakistan</div>
         </div>
         
         <div class="info-row">
-          <div class="info-label">Education:</div>
+          <div class="info-label">📚 Education:</div>
           <div class="info-value">Student of BSCS</div>
         </div>
       </div>
@@ -1677,14 +1719,31 @@ closeResults.addEventListener('click', () => {
 });
 
 /* =====================================================
-   FIXED DOWNLOAD FUNCTIONALITY - COMPLETELY HIDDEN API
+   FIXED DOWNLOAD WITH PROGRESS BAR - MP4 FIXED!
 ===================================================== */
 
-// Create a hidden iframe for downloads (completely hides the API URL)
-const downloadFrame = document.createElement('iframe');
-downloadFrame.style.display = 'none';
-downloadFrame.id = 'downloadFrame';
-document.body.appendChild(downloadFrame);
+// Working CORS proxies that don't require API keys - optimized for video
+const corsProxies = [
+  'https://api.allorigins.win/raw?url=',
+  'https://corsproxy.io/?',
+  'https://proxy.cors.sh/',
+  'https://cors-anywhere.herokuapp.com/'
+];
+
+// Timeout for large files (30 seconds)
+const DOWNLOAD_TIMEOUT = 30000;
+
+async function downloadWithTimeout(promise, timeoutMs) {
+  let timeoutHandle;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutHandle = setTimeout(() => reject(new Error('Download timeout - file may be too large')), timeoutMs);
+  });
+
+  return Promise.race([
+    promise,
+    timeoutPromise
+  ]).finally(() => clearTimeout(timeoutHandle));
+}
 
 async function downloadFile(url, filename, type) {
   if (!url) {
@@ -1692,6 +1751,7 @@ async function downloadFile(url, filename, type) {
     return;
   }
 
+  // Show progress bar and reset to 0
   progressWrapper.style.display = "block";
   progressBar.style.width = "0%";
   
@@ -1699,98 +1759,139 @@ async function downloadFile(url, filename, type) {
   downloadMp4Btn.disabled = true;
   downloadMp3Btn.disabled = true;
 
-  try {
-    showToast(`⏳ Preparing ${type} download...`);
-    
-    // Method 1: Try to fetch through a free CORS proxy (API URL stays on server, never exposed)
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-    
-    const response = await fetch(proxyUrl);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+  showToast(`⏳ Preparing ${type} download... (this may take a moment for videos)`);
+
+  let lastError = null;
+
+  // Try each proxy until one works
+  for (let i = 0; i < corsProxies.length; i++) {
+    try {
+      const proxyUrl = corsProxies[i] + encodeURIComponent(url);
+      
+      showToast(`🔄 Trying download method ${i + 1}/${corsProxies.length}...`);
+      
+      // Start the fetch with progress tracking and timeout
+      const response = await downloadWithTimeout(fetch(proxyUrl, {
+        headers: {
+          'Accept': 'video/mp4,audio/mpeg,*/*',
+          'Origin': window.location.origin
+        }
+      }), DOWNLOAD_TIMEOUT);
+      
+      if (!response.ok) {
+        throw new Error(`Proxy ${i + 1} failed (${response.status})`);
+      }
+      
+      // Get content length if available
+      const contentLength = response.headers.get('content-length');
+      const total = contentLength ? parseInt(contentLength, 10) : 0;
+      
+      // For large files, show a message
+      if (total > 50 * 1024 * 1024) { // 50MB
+        showToast(`📦 Large file detected (${(total/1024/1024).toFixed(1)}MB). Please wait...`);
+      }
+      
+      // Create a reader to stream the data
+      const reader = response.body.getReader();
+      let receivedLength = 0;
+      let chunks = [];
+      let lastUpdate = Date.now();
+      
+      // Read the stream chunk by chunk
+      while(true) {
+        const {done, value} = await reader.read();
+        
+        if (done) {
+          break;
+        }
+        
+        chunks.push(value);
+        receivedLength += value.length;
+        
+        // Update progress bar every 100ms to avoid too many updates
+        const now = Date.now();
+        if (now - lastUpdate > 100) {
+          if (total > 0) {
+            const percent = (receivedLength / total) * 100;
+            progressBar.style.width = percent + "%";
+          } else {
+            // If no content-length, show progress based on received data
+            const fakePercent = Math.min((receivedLength / 5000000) * 100, 95); // Assume ~5MB average
+            progressBar.style.width = fakePercent + "%";
+          }
+          lastUpdate = now;
+        }
+      }
+      
+      // Combine chunks into a single blob
+      const blob = new Blob(chunks, { type: type === 'MP4' ? 'video/mp4' : 'audio/mpeg' });
+      
+      // Create download link
+      const blobUrl = window.URL.createObjectURL(blob);
+      
+      // Complete the progress bar
+      progressBar.style.width = "100%";
+      
+      // Trigger download
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename.replace(/[^a-zA-Z0-9\s\-_.]/g, ''); // Clean filename
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      // Clean up
+      window.URL.revokeObjectURL(blobUrl);
+      
+      showToast(`✅ ${type} downloaded successfully! (${(receivedLength/1024/1024).toFixed(1)}MB)`);
+      
+      // Success - break out of loop
+      return;
+      
+    } catch (error) {
+      console.log(`Proxy ${i + 1} failed:`, error);
+      lastError = error;
+      
+      // Show progress for next attempt
+      if (i < corsProxies.length - 1) {
+        showToast(`⚠️ Method ${i + 1} failed, trying next...`);
+      }
+      
+      // Continue to next proxy
+      continue;
     }
+  }
+
+  // If all proxies failed, try direct download as last resort
+  try {
+    showToast("🔄 Trying direct download method...");
     
-    // Get the data as blob
-    const blob = await response.blob();
-    
-    // Create download link
-    const blobUrl = window.URL.createObjectURL(blob);
-    
-    // Trigger download
+    // Create a temporary anchor for direct download
     const a = document.createElement('a');
-    a.href = blobUrl;
-    a.download = filename.replace(/[^a-zA-Z0-9\s\-_.]/g, ''); // Clean filename
+    a.href = url;
+    a.download = filename;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     
-    // Clean up
-    window.URL.revokeObjectURL(blobUrl);
-    
-    // Simulate progress (since we can't track actual progress with this method)
     progressBar.style.width = "100%";
+    showToast(`✅ ${type} download started in new tab!`);
     
-    showToast(`✅ ${type} downloaded successfully!`);
-    
-  } catch (error) {
-    console.error("Download error:", error);
-    
-    try {
-      // Method 2: Try alternative proxy
-      showToast("Trying alternative method...");
-      
-      const altProxyUrl = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-      const response = await fetch(altProxyUrl);
-      const blob = await response.blob();
-      
-      const blobUrl = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = filename.replace(/[^a-zA-Z0-9\s\-_.]/g, '');
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(blobUrl);
-      
-      progressBar.style.width = "100%";
-      showToast(`✅ ${type} downloaded successfully!`);
-      
-    } catch (altError) {
-      console.error("Alternative download failed:", altError);
-      
-      // Method 3: Last resort - use a download service that hides the URL
-      showToast("Using secure download service...");
-      
-      // This service acts as a proxy and doesn't expose the real URL to the user
-      const secureDownloadUrl = `https://ddownload.online/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
-      
-      // Create a temporary anchor that points to our own fake endpoint
-      // The user only sees your domain, never the real API URL
-      const a = document.createElement('a');
-      a.href = secureDownloadUrl;
-      a.download = filename;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      
-      progressBar.style.width = "100%";
-      showToast(`✅ ${type} download started!`);
-    }
-    
-  } finally {
-    // Re-enable download buttons
-    downloadMp4Btn.disabled = false;
-    downloadMp3Btn.disabled = false;
-    
-    // Hide progress bar after a delay
-    setTimeout(() => {
-      progressWrapper.style.display = "none";
-      progressBar.style.width = "0%";
-    }, 2000);
+  } catch (directError) {
+    showToast("❌ All download methods failed. Please try again later.");
   }
+
+  // Re-enable download buttons
+  downloadMp4Btn.disabled = false;
+  downloadMp3Btn.disabled = false;
+  
+  // Hide progress bar after a delay
+  setTimeout(() => {
+    progressWrapper.style.display = "none";
+    progressBar.style.width = "0%";
+  }, 3000);
 }
 
 // MP4 Download
@@ -1805,7 +1906,6 @@ downloadMp4Btn.addEventListener('click', () => {
   title = title.replace(/[^a-zA-Z0-9\s]/g, '').substring(0, 50);
   const filename = title + ".mp4";
   
-  // The real API URL is passed to the function but NEVER exposed to the user
   downloadFile(currentVideoData.video.download_url, filename, "MP4");
 });
 
@@ -1821,7 +1921,6 @@ downloadMp3Btn.addEventListener('click', () => {
   title = title.replace(/[^a-zA-Z0-9\s]/g, '').substring(0, 50);
   const filename = title + ".mp3";
   
-  // The real API URL is passed to the function but NEVER exposed to the user
   downloadFile(currentVideoData.audio.download_url, filename, "MP3");
 });
 
